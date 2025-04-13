@@ -1,0 +1,26 @@
+service:
+  log_level: debug
+  flush: 1
+
+pipeline:
+  inputs:
+    - name: tcp
+      listen: 0.0.0.0
+      port: 5170
+      chunk_size: 32
+      buffer_size: 64
+      format: json # none
+      tag: incoming
+
+  filters:
+    - name: wasm
+      match: incoming
+      wasm_path: /fluent-bit/plugins/filter_rust.wasm
+      function_name: rust_filter
+      accessible_paths: .
+      wasm_heap_size: 20M
+      wasm_stack_size: 2M
+
+  outputs:
+    - name: stdout
+      match: incoming

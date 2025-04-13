@@ -1,0 +1,21 @@
+services:
+  fluentbit:
+    #image: fluent/fluent-bit:4.0.0-debug
+    image: fluent/fluent-bit:3.2.10-debug
+    container_name: fluentbit
+    command: 
+      - "/fluent-bit/bin/fluent-bit"
+      - "--config=/fluent-bit/config/fluent-bit.yaml"
+    #  - "--config=/fluent-bit/config/fluent-bit.conf"
+    ports:
+      - 5170:5170
+    networks:
+      - log-network
+    volumes:
+      - ./config:/fluent-bit/config
+      - ../target/wasm32-unknown-unknown/release:/fluent-bit/plugins
+      #- ../examples/filter_rust/target/wasm32-unknown-unknown/release/filter_rust.wasm:/fluent-bit/plugins
+
+networks:
+  log-network:
+    driver: bridge
