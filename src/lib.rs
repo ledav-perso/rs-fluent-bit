@@ -1,9 +1,13 @@
 // Import pure and fast JSON library written in Rust
+use hickory_client::proto::DnsHandle;
 use regex::Regex;
 use serde_json::json;
 use serde_json::Value;
 use std::os::raw::c_char;
 use std::slice;
+
+mod resolver;
+use resolver::get_hostname;
 
 #[no_mangle]
 pub extern "C" fn rust_filter(
@@ -35,11 +39,14 @@ pub extern "C" fn rust_filter(
         return message.to_string().as_ptr();
     };
 
+    let src_host = get_hostname(&fields["SRC"]);
+
     let message = json!({
         "message": json_record["iptable"],
         "original2": json_record.to_string(),
         "parse iptable record": "ok".to_string(),
         "SRC": &fields["SRC"],
+        "SRC_HOSTNAME": src_host,
         //"DST": &fields["DST"],
         //"PROTO": &fields["PROTO"],
         //"SPT": &fields["SPT"],
